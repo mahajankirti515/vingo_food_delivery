@@ -24,7 +24,7 @@ import Shop from './pages/Shop'
 import { io } from 'socket.io-client'
 import { setSocket } from '../redux/userSlice'
 
-export const serverURL = 'http://localhost:8000'
+export const serverURL = 'https://vingo-backend-sw1q.onrender.com'
 
 const App = () => {
   const {userData} = useSelector((state)=>state.user)
