@@ -1,10 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { act } from "react";
 
 const userSlice = createSlice({
   name: "user",
   initialState: {
     userData: null,
+    isLoading: true, // Start with loading true to prevent flash
+    error: null, // For handling authentication errors
     currentCity: null,
     currentState: null,
     currentAddress: null,
@@ -12,13 +13,24 @@ const userSlice = createSlice({
     itemInMyCity: null,
     cartItems: [],
     totalAmount: 0,
-    myOrders:[],
-    searchItems:null,
-    socket:null,
+    myOrders: [],
+    searchItems: null,
+    socket: null,
   },
   reducers: {
     setUserData: (state, action) => {
       state.userData = action.payload;
+    },
+    setLoading: (state, action) => {
+      state.isLoading = action.payload;
+    },
+    setError: (state, action) => {
+      state.error = action.payload;
+    },
+    clearUser: (state) => {
+      state.userData = null;
+      state.isLoading = false;
+      state.error = null;
     },
     setCurrentCity: (state, action) => {
       state.currentCity = action.payload;
@@ -75,42 +87,44 @@ const userSlice = createSlice({
       );
     },
     
-    setMyOrders:(state,action)=>{
-        state.myOrders=action.payload;
+    setMyOrders: (state, action) => {
+        state.myOrders = action.payload;
     },
-    addMyOrders:(state, action)=>{
-      state.myOrders=[action.payload, ...state.myOrders]
+    addMyOrders: (state, action) => {
+      state.myOrders = [action.payload, ...state.myOrders];
     },
-    updateOrderStatus:(state,action)=>{
-      const {orderId,shopId, status}=action.payload;
-      const order = state.myOrders.find(o=>o._id==orderId);
-      if(order){
-        if(order.shopOrders && order.shopOrders.shop._id==shopId){
-          order.shopOrders.status=status;
+    updateOrderStatus: (state, action) => {
+      const { orderId, shopId, status } = action.payload;
+      const order = state.myOrders.find(o => o._id == orderId);
+      if (order) {
+        if (order.shopOrders && order.shopOrders.shop._id == shopId) {
+          order.shopOrders.status = status;
         }
       }
     },
 
-    updateRealtimeOrderStatus:(state, action)=>{
-      const {orderId,shopId, status}=action.payload
-      const order = state.myOrders.find(o=>o._id==orderId);
-      if(order){
-        const shopOrder = order.shopOrders.find(o=>o.shop._id==shopId);
-        if(shopOrder){
-          shopOrder.status=status;
+    updateRealtimeOrderStatus: (state, action) => {
+      const { orderId, shopId, status } = action.payload;
+      const order = state.myOrders.find(o => o._id == orderId);
+      if (order) {
+        const shopOrder = order.shopOrders.find(o => o.shop._id == shopId);
+        if (shopOrder) {
+          shopOrder.status = status;
         }
       }
     },
 
-    setSearchItems:(state, action)=>{
-      state.searchItems=action.payload;
+    setSearchItems: (state, action) => {
+      state.searchItems = action.payload;
     }
-
   },
 });
 
 export const {
   setUserData,
+  setLoading,
+  setError,
+  clearUser,
   addToCart,
   setCurrentCity,
   setCurrentState,
@@ -123,6 +137,8 @@ export const {
   addMyOrders,
   updateOrderStatus,
   setSearchItems,
-  setSocket, updateRealtimeOrderStatus
+  setSocket,
+  updateRealtimeOrderStatus
 } = userSlice.actions;
+
 export default userSlice.reducer;
