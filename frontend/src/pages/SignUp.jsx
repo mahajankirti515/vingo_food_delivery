@@ -33,7 +33,7 @@ const SignUp = () => {
   // Auto-redirect if user is already logged in
   useEffect(() => {
     if (user && user.email) {
-      navigate('/home'); // or your dashboard route
+      navigate('/'); // Changed from '/home' to '/'
     }
   }, [user, navigate]);
 
@@ -97,8 +97,8 @@ const SignUp = () => {
       dispatch(setUserData(result.data.user));
       console.log(result.data.user);
       
-      // Navigate to home after successful signup
-      navigate('/home');
+      // Navigate to root after successful signup
+      navigate('/'); // Changed from '/home' to '/'
       
     } catch (error) {
       const errorMessage = error.response?.data?.message || error.message || 'Signup failed';
@@ -144,8 +144,8 @@ const SignUp = () => {
       console.log(response.data);
       dispatch(setUserData(response.data.user)); // Fixed: response.data not data
       
-      // Navigate to home after successful Google signup
-      navigate('/home');
+      // Navigate to root after successful Google signup
+      navigate('/'); // Changed from '/home' to '/'
       
     } catch (error) {
       const errorMessage = error.response?.data?.message || error.message || 'Google sign-up failed';
