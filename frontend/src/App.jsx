@@ -27,7 +27,7 @@ import { setSocket } from '../redux/userSlice'
 export const serverURL = 'https://vingo-backend-sw1q.onrender.com'
 
 const App = () => {
-  const {userData} = useSelector((state)=>state.user)
+  const { userData } = useSelector((state) => state.user)
   const dispatch = useDispatch()
   
   useGetCurrentUser()
@@ -38,34 +38,79 @@ const App = () => {
   useUpdateLocation()
   useGetMyShop()
 
-  useEffect(()=>{
-   const socketInstance = io(serverURL,{withCredentials:true})
-   dispatch(setSocket(socketInstance))
-   socketInstance.on('connect',()=>{
-     if(userData){
-       socketInstance.emit('identity', {userId:userData._id})
-     }
-   })
-   return()=>{
-    socketInstance.disconnect()
-   }
-  },[userData?._id])
+  useEffect(() => {
+    if (userData?._id) {
+      const socketInstance = io(serverURL, { withCredentials: true })
+      dispatch(setSocket(socketInstance))
+      
+      socketInstance.on('connect', () => {
+        socketInstance.emit('identity', { userId: userData._id })
+      })
+
+      // Proper cleanup function
+      return () => {
+        socketInstance.disconnect()
+      }
+    }
+  }, [userData?._id, dispatch])
 
   return (
     <Routes>
-      <Route path='/signup' element={!userData?<SignUp/>:<Navigate to={"/"}/>} />
-      <Route path='/signin' element={!userData?<SignIn/>:<Navigate to={"/"}/>} />
-      <Route path='/forgot-password' element={!userData?<ForgotPassword/>:<Navigate to={"/"}/>} />
-       <Route path='/' element={userData?<Home/>:<Navigate to={"/signin"}/>} />
-       <Route path='/create-edit-shop' element={userData?<CreateEditShop/>:<Navigate to={"/signin"}/>} />
-       <Route path='/add-item' element={userData?<AddItem/>:<Navigate to={"/signin"}/>} />
-       <Route path='/edit-item/:itemId' element={userData?<EditItem/>:<Navigate to={"/signin"}/>} />
-       <Route path='/cart' element={userData?<CartPage/>:<Navigate to={"/signin"}/>} />
-       <Route path='/checkout' element={userData?<CheckOut/>:<Navigate to={"/signin"}/>} />
-       <Route path='/order-placed' element={userData?<OrderPlaced/>:<Navigate to={"/signin"}/>} />
-       <Route path='/my-orders' element={userData?<MyOrders/>:<Navigate to={"/signin"}/>} />
-       <Route path='/track-order/:orderId' element={userData?<TrackOrderPage/>:<Navigate to={"/signin"}/>} />
-       <Route path='/shop/:shopId' element={userData?<Shop/>:<Navigate to={"/signin"}/>} />
+      {/* Public Routes - Only show when user is NOT authenticated */}
+      <Route 
+        path='/signup' 
+        element={!userData ? <SignUp /> : <Navigate to="/" replace />} 
+      />
+      <Route 
+        path='/signin' 
+        element={!userData ? <SignIn /> : <Navigate to="/" replace />} 
+      />
+      <Route 
+        path='/forgot-password' 
+        element={!userData ? <ForgotPassword /> : <Navigate to="/" replace />} 
+      />
+      
+      {/* Protected Routes - Only show when user IS authenticated */}
+      <Route 
+        path='/' 
+        element={userData ? <Home /> : <Navigate to="/signin" replace />} 
+      />
+      <Route 
+        path='/create-edit-shop' 
+        element={userData ? <CreateEditShop /> : <Navigate to="/signin" replace />} 
+      />
+      <Route 
+        path='/add-item' 
+        element={userData ? <AddItem /> : <Navigate to="/signin" replace />} 
+      />
+      <Route 
+        path='/edit-item/:itemId' 
+        element={userData ? <EditItem /> : <Navigate to="/signin" replace />} 
+      />
+      <Route 
+        path='/cart' 
+        element={userData ? <CartPage /> : <Navigate to="/signin" replace />} 
+      />
+      <Route 
+        path='/checkout' 
+        element={userData ? <CheckOut /> : <Navigate to="/signin" replace />} 
+      />
+      <Route 
+        path='/order-placed' 
+        element={userData ? <OrderPlaced /> : <Navigate to="/signin" replace />} 
+      />
+      <Route 
+        path='/my-orders' 
+        element={userData ? <MyOrders /> : <Navigate to="/signin" replace />} 
+      />
+      <Route 
+        path='/track-order/:orderId' 
+        element={userData ? <TrackOrderPage /> : <Navigate to="/signin" replace />} 
+      />
+      <Route 
+        path='/shop/:shopId' 
+        element={userData ? <Shop /> : <Navigate to="/signin" replace />} 
+      />
     </Routes>
   )
 }
