@@ -27,7 +27,7 @@ import { setSocket } from '../redux/userSlice'
 export const serverURL = 'https://vingo-backend-sw1q.onrender.com'
 
 const App = () => {
-  const { userData } = useSelector((state) => state.user)
+  const { userData, isLoading } = useSelector((state) => state.user) // Added isLoading
   const dispatch = useDispatch()
   
   useGetCurrentUser()
@@ -53,6 +53,24 @@ const App = () => {
       }
     }
   }, [userData?._id, dispatch])
+
+  // Show loading screen while fetching user data
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen w-full" style={{backgroundColor: '#fff9f6'}}>
+        <div className="text-center">
+          <h1 className="text-3xl font-bold mb-4" style={{color: '#ff4d2d'}}>
+            Vingo
+          </h1>
+          <div className="text-lg text-gray-600">Loading...</div>
+          {/* You can replace this with a spinner or loading component */}
+          <div className="mt-4">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto" style={{borderColor: '#ff4d2d'}}></div>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <Routes>
