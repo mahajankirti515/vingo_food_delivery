@@ -8,10 +8,9 @@ import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { auth } from '../../firebase';
 import { ClipLoader } from 'react-spinners';
 import { useDispatch, useSelector } from 'react-redux';
-import { setUserData } from '../../redux/userSlice';
+import { setUserData, setLoading, setError } from '../../redux/userSlice';
 
 const SignIn = () => {
-
   const primaryColor = '#ff4d2d';
   const bgColor = '#fff9f6';
   const borderColor = '#ddd';
@@ -31,7 +30,7 @@ const SignIn = () => {
   // Auto-redirect if user is already logged in
   useEffect(() => {
     if (user && user.email) {
-      navigate('/'); // Changed from '/home' to '/'
+      navigate('/', { replace: true }); // Added replace: true
     }
   }, [user, navigate]);
 
@@ -46,6 +45,7 @@ const SignIn = () => {
 
     setLoading(true);
     setErr(''); // Clear previous errors
+    dispatch(setLoading(true)); // Set global loading state
 
     try {
       const result = await axios.post(`${serverURL}/api/auth/signin`, {
@@ -54,23 +54,32 @@ const SignIn = () => {
       }, { withCredentials: true });
 
       console.log(result.data);
-      dispatch(setUserData(result.data.user));
       
-      // Navigate to root after successful login
-      navigate('/'); // Changed from '/home' to '/'
+      // Dispatch user data and clear any errors
+      await dispatch(setUserData(result.data.user));
+      dispatch(setError(null));
+      
+      // Navigate with replace to prevent back button issues
+      setTimeout(() => {
+        navigate('/', { replace: true });
+      }, 100);
       
     } catch (error) {
       const errorMessage = error.response?.data?.message || error.message || 'Sign in failed';
       console.error('Sign in error:', errorMessage);
       setErr(errorMessage);
+      dispatch(setError(errorMessage));
+      dispatch(setUserData(null));
     } finally {
-      setLoading(false); // Always stop loading
+      setLoading(false); // Always stop local loading
+      dispatch(setLoading(false)); // Always stop global loading
     }
   };
 
   const handleGoogleAuth = async () => {
     setLoading(true);
     setErr(''); // Clear previous errors
+    dispatch(setLoading(true)); // Set global loading state
 
     try {
       const provider = new GoogleAuthProvider();
@@ -85,17 +94,25 @@ const SignIn = () => {
       }, { withCredentials: true });
       
       console.log(response.data);
-      dispatch(setUserData(response.data.user)); // Fixed: response.data not data
       
-      // Navigate to root after successful Google auth
-      navigate('/'); // Changed from '/home' to '/'
+      // Dispatch user data and clear any errors
+      await dispatch(setUserData(response.data.user));
+      dispatch(setError(null));
+      
+      // Navigate with replace to prevent back button issues
+      setTimeout(() => {
+        navigate('/', { replace: true });
+      }, 100);
       
     } catch (error) {
       const errorMessage = error.response?.data?.message || error.message || 'Google sign-in failed';
       console.error('Google auth error:', errorMessage);
       setErr(errorMessage);
+      dispatch(setError(errorMessage));
+      dispatch(setUserData(null));
     } finally {
       setLoading(false);
+      dispatch(setLoading(false)); // Always stop global loading
     }
   };
 
