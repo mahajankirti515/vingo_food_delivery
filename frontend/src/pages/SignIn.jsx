@@ -10,7 +10,7 @@ import { ClipLoader } from 'react-spinners';
 import { useDispatch, useSelector } from 'react-redux';
 import { setUserData } from '../../redux/userSlice';
 
-const SignIn = () => { // Changed from SignUp to SignIn (correct component name)
+const SignIn = () => {
 
   const primaryColor = '#ff4d2d';
   const bgColor = '#fff9f6';
@@ -31,7 +31,7 @@ const SignIn = () => { // Changed from SignUp to SignIn (correct component name)
   // Auto-redirect if user is already logged in
   useEffect(() => {
     if (user && user.email) {
-      navigate('/home'); // or your dashboard route
+      navigate('/'); // Changed from '/home' to '/'
     }
   }, [user, navigate]);
 
@@ -56,8 +56,8 @@ const SignIn = () => { // Changed from SignUp to SignIn (correct component name)
       console.log(result.data);
       dispatch(setUserData(result.data.user));
       
-      // Navigate to home after successful login
-      navigate('/home');
+      // Navigate to root after successful login
+      navigate('/'); // Changed from '/home' to '/'
       
     } catch (error) {
       const errorMessage = error.response?.data?.message || error.message || 'Sign in failed';
@@ -87,8 +87,8 @@ const SignIn = () => { // Changed from SignUp to SignIn (correct component name)
       console.log(response.data);
       dispatch(setUserData(response.data.user)); // Fixed: response.data not data
       
-      // Navigate to home after successful Google auth
-      navigate('/home');
+      // Navigate to root after successful Google auth
+      navigate('/'); // Changed from '/home' to '/'
       
     } catch (error) {
       const errorMessage = error.response?.data?.message || error.message || 'Google sign-in failed';
@@ -209,4 +209,4 @@ const SignIn = () => { // Changed from SignUp to SignIn (correct component name)
   );
 };
 
-export default SignIn; // Changed from SignUp to SignIn
+export default SignIn;
